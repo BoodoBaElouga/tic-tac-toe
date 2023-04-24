@@ -13,8 +13,8 @@ class GameController extends AbstractController
     public function homePage(): Response {
         return $this->render('game/homepage.html.twig');
     }
-
+    #[Route('/play', name: 'init_game')]
     public function initGame(): Response {
-        return new Response("New game");
+        return $this->render('game/playingfield.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player1"]);
     }
 }

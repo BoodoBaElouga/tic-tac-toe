@@ -2,14 +2,37 @@
 
 {% block body %}
 
-<div class="tic-tac-toe-board">
-    {% for row in range(3) %}
-        <div class="tic-tac-toe-row">
-            {% for col in range(3) %}
-                <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}"></div>
+    <div class="tic-tac-toe-board">
+
+        <div class="players">
+            <div class="player1">Player1: <span>{{ score1 }}</span></div>
+            <div class="player2">Player2: <span> {{ score2 }}</span></div>
+        </div>
+        <div class="tic-tac-toe-board">
+            {% for row in range(0, 2) %}
+                <div class="tic-tac-toe-row">
+                    {% for col in range(0, 2) %}
+                        <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}"></div>
+                    {% endfor %}
+                </div>
             {% endfor %}
         </div>
-    {% endfor %}
-</div>
+
+        <div class="bottom-field">
+
+            <div class="replay-button">
+                <button id="Replay">
+                    <a href="{{ path('init_game') }}">replay</a>
+                </button>
+            </div>
+
+            <div class="turn-info">
+            <span>
+                {{ turnInfo }} is up
+            </span>
+            </div>
+        </div>
+
+    </div>
 
 {% endblock %}

@@ -1,7 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Create a new Record | {{ parent() }}{% endblock %}
+{% block title %} {{ parent() }} {% endblock %}
 
 {% block body %}
-{{ "Hier an der Stelle kommt spaeter das Spielfeld. zum Starten die Schaltflaeche \"play\" druecken"}}
+    <h1 class="welcome-message ">Hier an der Stelle kommt spaeter das Spielfeld.<br>Zum Starten die Schaltflaeche "play"
+        druecken</h1>
+    <div class="play">
+        <button id="play">
+            <a href="{{ path('init_game') }}">play</a>
+        </button>
+    </div>
 {% endblock %}

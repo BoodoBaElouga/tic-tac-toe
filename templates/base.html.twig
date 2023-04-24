@@ -2,9 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Tic Tac Toe{% endblock %}</title>
 
-    <link rel="stylesheet" href="{{ asset('styles/game.css') }}">
+
 
     {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
     {% block stylesheets %}
@@ -16,7 +18,9 @@
     {% endblock %}
 </head>
 <body>
-
+    <div class="header">
+        <h1>Tic Tac Toe</h1>
+    </div>
 <!-- Main Navigation -->
 
 <!-- End Main Navigation -->

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="tic-tac-toe-board">
+    {% for row in range(3) %}
+        <div class="tic-tac-toe-row">
+            {% for col in range(3) %}
+                <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}"></div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

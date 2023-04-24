@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Tic Tac Toe{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ asset('styles/game.css') }}">
+
+    {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+</head>
+<body>
+
+<!-- Main Navigation -->
+
+<!-- End Main Navigation -->
+
+{% block body %}{% endblock %}
+
+<!-- Footer -->
+
+<!-- End Footer -->
+
+</body>
+</html>

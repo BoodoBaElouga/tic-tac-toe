@@ -19,7 +19,7 @@ $(document).ready(function () {
     $.ajax({
       url: "/play",
       type: "POST",
-      data: { /* optional: Daten, die an den Controller übergeben werden sollen */},
+      data: { },
       success: function (response) {
         // Handle die Antwort vom Controller
         $('body').html(response);
@@ -27,7 +27,6 @@ $(document).ready(function () {
         history.pushState(null, null, "/play");
       },
       error: function (xhr) {
-        // Handle die Fehlermeldung, falls der Aufruf fehlschlägt
         console.log(xhr.responseText);
       }
     });
@@ -38,19 +37,42 @@ $(document).ready(function () {
     $.ajax({
       url: "/",
       type: "POST",
-      data: { /* optional: Daten, die an den Controller übergeben werden sollen */},
+      data: { },
       success: function (response) {
-        // Handle die Antwort vom Controller
         $('body').html(response);
 
         history.pushState(null, null, "/play");
       },
       error: function (xhr) {
-        // Handle die Fehlermeldung, falls der Aufruf fehlschlägt
         console.log(xhr.responseText);
       }
     });
   });
+
+
+  $('.tic-tac-toe-cell').click(function() {
+    const typed_cell = $(this).attr('id');
+    var player = $('.turn-info').children().attr('id');
+
+    $(this).html('X');
+    $.ajax({
+      url: "/manager",
+      type: "POST",
+      data: {
+        'typed_cell': typed_cell,
+        'player': player
+      },
+      success: function (response) {
+        $('.bottom-field').html(response);
+
+        history.pushState(null, null, "/manager");
+      },
+      error: function (xhr) {
+        console.log(xhr.responseText);
+      }
+    });
+  });
+
 
 });
 

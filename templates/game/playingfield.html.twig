@@ -9,10 +9,12 @@
             <div class="player2">Player2: <span> {{ score2 }}</span></div>
         </div>
         <div class="tic-tac-toe-board">
+            {% set cell_id = 0 %}
             {% for row in range(0, 2) %}
                 <div class="tic-tac-toe-row">
                     {% for col in range(0, 2) %}
-                        <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}"></div>
+                        {% set cell_id = cell_id + 1 %}
+                        <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}" id="{{ cell_id}}"></div>
                     {% endfor %}
                 </div>
             {% endfor %}
@@ -27,7 +29,7 @@
             </div>
 
             <div class="turn-info">
-            <span>
+            <span id="{{ turnInfo }}">
                 {{ turnInfo }} is up
             </span>
             </div>

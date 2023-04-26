@@ -54,7 +54,12 @@ $(document).ready(function () {
     const typed_cell = $(this).attr('id');
     var player = $('.turn-info').children().attr('id');
 
-    $(this).html('X');
+    if (player === "Player1") {
+      $(this).html('P1');
+    }
+    else{
+      $(this).html('P2');
+    }
     $.ajax({
       url: "/manager",
       type: "POST",
@@ -65,7 +70,7 @@ $(document).ready(function () {
       success: function (response) {
         $('.bottom-field').html(response);
 
-        history.pushState(null, null, "/manager");
+        // history.pushState(null, null, "/manager");
       },
       error: function (xhr) {
         console.log(xhr.responseText);

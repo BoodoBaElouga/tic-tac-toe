@@ -14,26 +14,29 @@
                 <div class="tic-tac-toe-row">
                     {% for col in range(0, 2) %}
                         {% set cell_id = cell_id + 1 %}
-                        <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}" id="{{ cell_id}}"></div>
+                        <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}"
+                             id="{{ cell_id }}"></div>
                     {% endfor %}
                 </div>
             {% endfor %}
         </div>
 
-        <div class="bottom-field">
+        {% block bottomField %}
+            <div class="bottom-field">
 
-            <div class="replay-button">
-                <button id="replay">
-                    replay
-                </button>
-            </div>
+                <div class="replay-button">
+                    <button id="replay">
+                        replay
+                    </button>
+                </div>
 
-            <div class="turn-info">
+                <div class="turn-info">
             <span id="{{ turnInfo }}">
                 {{ turnInfo }} is up
             </span>
+                </div>
             </div>
-        </div>
+        {% endblock %}
 
     </div>
 

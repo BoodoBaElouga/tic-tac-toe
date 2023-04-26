@@ -10,6 +10,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GameController extends AbstractController
 {
+
+    private int $scorePlayer1;
+
+    private int $scorePlayer2;
+
     private $gameState;
     /**
      * @var \int[][]
@@ -25,6 +30,26 @@ class GameController extends AbstractController
     }
 
 
+    public function getWinnigConditions() {
+        $this->winningConditions;
+    }
+
+    public function getScorePlayer1(): int {
+        return $this->scorePlayer1;
+    }
+
+    public function getScorePlayer2(): int {
+        return $this->scorePlayer2;
+    }
+
+    public function setScorePlayer1(int $score): void {
+        $this->scorePlayer1 = $score;
+    }
+
+    public function setScorePlayer2(int $score): void {
+        $this->scorePlayer2 = $score;
+    }
+
     #[Route('/', name: 'Tic Tac Toe')]
     public function homePage(): Response
     {
@@ -34,6 +59,8 @@ class GameController extends AbstractController
     #[Route('/play', name: 'init_game')]
     public function initGame(): Response
     {
+        $this->scorePlayer1 = 0;
+        $this->scorePlayer2 = 0;
         $this->gameState = array("", "", "", "", "", "", "", "", "");
         $this->winningConditions = [
             [0, 1, 2],
@@ -56,6 +83,38 @@ class GameController extends AbstractController
 
         // prüfen, ob der Spielzug zulläsig ist
         if ($this->handleCellPlayed($this->getGameState(), intval($typedCell), $player)) {
+
+            // wenn insgesammt 6 Zellen schon befüllt sind, sollte man mit der Auswertung beginnen
+            if ($this->countTypedCells($this->getGameState()) >= 6 ) {
+                // check ob das Spiel schon gewonnen ist
+
+                // Player1 hat gewonnen
+                if ($this->isWining($this->getGameState(), $this->getWinnigConditions()) === "Player1") {
+                    $response = $this->render('game/finish.html.twig', ["winner" => "Player1"]);
+                    $response->setStatusCode(200);
+                    return $response;
+                }
+
+                // Player2 hat gewonnen
+                elseif ($this->isWining($this->getGameState(), $this->getWinnigConditions()) === "Player2") {
+                    $response = $this->render('game/finish.html.twig', ["winner" => "Player2"]);
+                    $response->setStatusCode(200);
+                    return $response;
+                }
+
+                // Kein oder noch kein Gewinner
+                else{
+                    // überprüfen ob unentschieden steht
+                    if ($this->isDraw($this->getGameState())) {
+                        #TODO: Welche View?
+                    }
+                    // Noch kein Geweinner (Spiel noch nicht beendet)
+                    else {
+                        #TODO: Welche View?
+                    }
+                }
+            }
+
             if ($player === "Player1") {
                 $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player2"]);
                 $response->setStatusCode(403);
@@ -66,19 +125,6 @@ class GameController extends AbstractController
             return $response;
         } // Spielzug unzulässig
         else {
-            // unentschieden
-            if ($this->isDraw($this->getGameState())) {
-                if ($player === "Player1") {
-                    $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player2"]);
-                    $response->setStatusCode(403);
-                    return $response;
-                }
-                $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player1"]);
-                $response->setStatusCode(403);
-                return $response;
-            } elseif (!)
-
-
             if ($player === "Player1") {
                 $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player1"]);
                 $response->setStatusCode(405);
@@ -172,5 +218,20 @@ class GameController extends AbstractController
             }
         }
         return false;
+    }
+
+    /**
+     * Die Methode zählt alle Zellen, die von Spielern getippt wurde
+     * @param array $gameState
+     * @return int
+     */
+    private function countTypedCells(array $gameState): int {
+        $counter = 0;
+        foreach ($gameState as $stateItem) {
+            if (!empty($stateItem)) {
+                $counter++;
+            }
+        }
+        return $counter;
     }
 }

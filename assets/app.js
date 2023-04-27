@@ -54,12 +54,6 @@ $(document).ready(function () {
     const typed_cell = $(this).attr('id');
     var player = $('.turn-info').children().attr('id');
 
-    if (player === "Player1") {
-      $(this).html('P1');
-    }
-    else{
-      $(this).html('P2');
-    }
     $.ajax({
       url: "/manager",
       type: "POST",
@@ -68,7 +62,39 @@ $(document).ready(function () {
         'player': player
       },
       success: function (response) {
-        $('.bottom-field').html(response);
+        // Spielzug unzulässig
+        if (response.code === 405){
+          var fehlerMeldung = document.createElement("p");
+          fehlerMeldung.innerText = "Unzulässiger Spielzug";
+          fehlerMeldung.style.color = "red";
+
+          var bottomFieldElement = $('.bottom-field');
+
+          if(bottomFieldElement.find('p').length > 0) {
+            // das Element "fehlerMeldung" ist bereits vorhanden
+            fehlerMeldung.style.display = "block";
+            setTimeout(function() {
+              fehlerMeldung.style.display = "none";
+            }, 2000);
+          } else {
+            // das Element "fehlerMeldung" muss hinzugefügt werden
+            bottomFieldElement.appendChild(fehlerMeldung);
+            setTimeout(function() {
+              fehlerMeldung.style.display = "none";
+            }, 2000);
+          }
+        }
+
+        // Spielzug zulässig
+        if (response.code) {
+          if (player === "Player1") {
+            $(this).html('P1');
+          }
+          else{
+            $(this).html('P2');
+          }
+          $('.bottom-field').html(response);
+        }
 
         // history.pushState(null, null, "/manager");
       },

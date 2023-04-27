@@ -15,6 +15,13 @@ class GameController extends AbstractController
 
     private int $scorePlayer2;
 
+    private string $currentPlayer;
+
+    private function getCurrentPlayer(): string
+    {
+        return $this->currentPlayer;
+    }
+
     private $gameState;
     /**
      * @var \int[][]
@@ -30,24 +37,34 @@ class GameController extends AbstractController
     }
 
 
-    public function getWinnigConditions() {
+    public function getWinnigConditions()
+    {
         $this->winningConditions;
     }
 
-    public function getScorePlayer1(): int {
+    public function getScorePlayer1(): int
+    {
         return $this->scorePlayer1;
     }
 
-    public function getScorePlayer2(): int {
+    public function getScorePlayer2(): int
+    {
         return $this->scorePlayer2;
     }
 
-    public function setScorePlayer1(int $score): void {
-        $this->scorePlayer1 = $score;
+    public function setScorePlayer1(int $score): void
+    {
+        $this->scorePlayer1 = $score++;
     }
 
-    public function setScorePlayer2(int $score): void {
-        $this->scorePlayer2 = $score;
+    public function setScorePlayer2(int $score): void
+    {
+        $this->scorePlayer2 = $score++;
+    }
+
+    public function setCurrentPlayer(string $player): void
+    {
+        $this->currentPlayer = $player;
     }
 
     #[Route('/', name: 'Tic Tac Toe')]
@@ -61,6 +78,7 @@ class GameController extends AbstractController
     {
         $this->scorePlayer1 = 0;
         $this->scorePlayer2 = 0;
+        $this->currentPlayer = "Player1";
         $this->gameState = array("", "", "", "", "", "", "", "", "");
         $this->winningConditions = [
             [0, 1, 2],
@@ -84,53 +102,60 @@ class GameController extends AbstractController
         // prüfen, ob der Spielzug zulläsig ist
         if ($this->handleCellPlayed($this->getGameState(), intval($typedCell), $player)) {
 
+            if ($player === "Player1") {
+                $this->setCurrentPlayer("Player2");
+            } else {
+                $this->setCurrentPlayer("Player1");
+            }
+
             // wenn insgesammt 6 Zellen schon befüllt sind, sollte man mit der Auswertung beginnen
-            if ($this->countTypedCells($this->getGameState()) >= 6 ) {
+            if ($this->countTypedCells($this->getGameState()) >= 6) {
                 // check ob das Spiel schon gewonnen ist
 
                 // Player1 hat gewonnen
                 if ($this->isWining($this->getGameState(), $this->getWinnigConditions()) === "Player1") {
+                    $this->setScorePlayer1($this->getScorePlayer1());
                     $response = $this->render('game/finish.html.twig', ["winner" => "Player1"]);
                     $response->setStatusCode(200);
                     return $response;
-                }
-
-                // Player2 hat gewonnen
+                } // Player2 hat gewonnen
                 elseif ($this->isWining($this->getGameState(), $this->getWinnigConditions()) === "Player2") {
+                    $this->setScorePlayer2($this->getScorePlayer2());
                     $response = $this->render('game/finish.html.twig', ["winner" => "Player2"]);
                     $response->setStatusCode(200);
                     return $response;
-                }
-
-                // Kein oder noch kein Gewinner
-                else{
+                } // Kein oder noch kein Gewinner
+                else {
                     // überprüfen ob unentschieden steht
                     if ($this->isDraw($this->getGameState())) {
-                        #TODO: Welche View?
-                    }
-                    // Noch kein Geweinner (Spiel noch nicht beendet)
+                        $response = $this->render('game/draw.html.twig');
+                        $response->setStatusCode(200);
+                        return $response;
+                    } // Noch kein Gewinner (Spiel noch nicht beendet)
                     else {
-                        #TODO: Welche View?
+                        $response = $this->render('game/bottomGameInfo.html.twig',
+                            ["score1" => $this->getScorePlayer1(), "score2" => $this->getScorePlayer2(), "turnInfo" => $this->getCurrentPlayer()]);
+                        $response->setStatusCode(200);
+                        return $response;
                     }
                 }
             }
-
-            if ($player === "Player1") {
-                $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player2"]);
-                $response->setStatusCode(403);
-                return $response;
-            }
-            $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player1"]);
-            $response->setStatusCode(403);
+            // Weniger als 6 Zellen befüllt. Das Spiel geht ganz normal weiter.
+            $response = $this->render('game/bottomGameInfo.html.twig',
+                ["score1" => $this->getScorePlayer1(), "score2" => $this->getScorePlayer2(), "turnInfo" => $this->getCurrentPlayer()]);
+            $response->setStatusCode(200);
             return $response;
+
         } // Spielzug unzulässig
         else {
             if ($player === "Player1") {
-                $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player1"]);
+                $response = $this->render('game/bottomGameInfo.html.twig',
+                    ["score1" => $this->getScorePlayer1(), "score2" => $this->getScorePlayer2(), "turnInfo" => "Player1"]);
                 $response->setStatusCode(405);
                 return $response;
             }
-            $response = $this->render('game/bottomGameInfo.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player2"]);
+            $response = $this->render('game/bottomGameInfo.html.twig',
+                ["score1" => $this->getScorePlayer1(), "score2" => $this->getScorePlayer2(), "turnInfo" => "Player2"]);
             $response->setStatusCode(405);
             return $response;
         }
@@ -193,7 +218,8 @@ class GameController extends AbstractController
      * @param $playerId
      * @return array
      */
-    private function getAllTypedCellFromPlayer(array $gameState, $playerId) {
+    private function getAllTypedCellFromPlayer(array $gameState, $playerId)
+    {
         $playerIndexes = array();
         for ($i = 0; $i < count($gameState); $i++) {
             if ($gameState[$i] === $playerId) {
@@ -211,7 +237,8 @@ class GameController extends AbstractController
      * @param $playerIndexes
      * @return bool
      */
-    private function checkForWiningCondition($winingCondition, $playerIndexes): bool{
+    private function checkForWiningCondition($winingCondition, $playerIndexes): bool
+    {
         foreach ($winingCondition as $item) {
             if ($item === $playerIndexes) {
                 return true;
@@ -225,7 +252,8 @@ class GameController extends AbstractController
      * @param array $gameState
      * @return int
      */
-    private function countTypedCells(array $gameState): int {
+    private function countTypedCells(array $gameState): int
+    {
         $counter = 0;
         foreach ($gameState as $stateItem) {
             if (!empty($stateItem)) {

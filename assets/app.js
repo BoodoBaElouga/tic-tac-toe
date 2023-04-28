@@ -84,7 +84,7 @@ $(document).ready(function () {
             }, 2000);
           }
         }
-
+        
         // Spielzug zulässig
         if (response.code) {
           if (player === "Player1") {

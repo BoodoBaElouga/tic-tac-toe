@@ -10,6 +10,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GameController extends AbstractController
 {
+    private string $test = "test";
+
+    private function getTest(): string
+    {
+        return $this->test;
+    }
 
     private int $scorePlayer1;
 
@@ -23,10 +29,8 @@ class GameController extends AbstractController
     }
 
     private $gameState;
-    /**
-     * @var \int[][]
-     */
-    private array $winningConditions;
+
+    private $winningConditions;
 
     /**
      * @return mixed
@@ -37,9 +41,9 @@ class GameController extends AbstractController
     }
 
 
-    public function getWinnigConditions()
+    public function getWinningConditions()
     {
-        $this->winningConditions;
+        return $this->winningConditions;
     }
 
     public function getScorePlayer1(): int
@@ -74,8 +78,10 @@ class GameController extends AbstractController
     }
 
     #[Route('/play', name: 'init_game')]
-    public function initGame(): Response
+    public function initGame(Request $request): Response
     {
+        $session = $request->getSession();
+
         $this->scorePlayer1 = 0;
         $this->scorePlayer2 = 0;
         $this->currentPlayer = "Player1";
@@ -90,12 +96,30 @@ class GameController extends AbstractController
             [0, 4, 8],
             [2, 4, 6]
         ];
+
+        $session->set('info',
+            ['scorePlayer1' => $this->getScorePlayer1(),
+                'scorePlayer2' => $this->getScorePlayer2(),
+                'currentPlayer' => $this->getCurrentPlayer(),
+                'gameState' => $this->getGameState(),
+                'winningConditions' => $this->getWinningConditions()]);
+
+        var_dump($session->getId());
+
         return $this->render('game/playingfield.html.twig', ["score1" => 0, "score2" => 0, "turnInfo" => "Player1"]);
     }
 
     #[Route('/manager', name: 'game_manager')]
     public function gameManager(Request $request): Response
     {
+        $session = $request->getSession();
+
+        $this->scorePlayer1 = $session->get('info')['scorePlayer1'];
+        $this->scorePlayer2 = $session->get('info')['scorePlayer2'];
+        $this->currentPlayer = $session->get('info')['currentPlayer'];
+        $this->gameState = $session->get('info')['gameState'];
+        $this->winningConditions = $session->get('info')['winningConditions'];
+
         $typedCell = $request->request->get('typed_cell');
         $player = $request->request->get('player');
 
@@ -113,13 +137,13 @@ class GameController extends AbstractController
                 // check ob das Spiel schon gewonnen ist
 
                 // Player1 hat gewonnen
-                if ($this->isWining($this->getGameState(), $this->getWinnigConditions()) === "Player1") {
+                if ($this->isWining($this->getGameState(), $this->getWinningConditions()) === "Player1") {
                     $this->setScorePlayer1($this->getScorePlayer1());
                     $response = $this->render('game/finish.html.twig', ["winner" => "Player1"]);
                     $response->setStatusCode(200);
                     return $response;
                 } // Player2 hat gewonnen
-                elseif ($this->isWining($this->getGameState(), $this->getWinnigConditions()) === "Player2") {
+                elseif ($this->isWining($this->getGameState(), $this->getWinningConditions()) === "Player2") {
                     $this->setScorePlayer2($this->getScorePlayer2());
                     $response = $this->render('game/finish.html.twig', ["winner" => "Player2"]);
                     $response->setStatusCode(200);

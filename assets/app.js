@@ -19,7 +19,7 @@ $(document).ready(function () {
     $.ajax({
       url: "/play",
       type: "POST",
-      data: { },
+      data: {},
       success: function (response) {
         // Handle die Antwort vom Controller
         $('body').html(response);
@@ -34,14 +34,15 @@ $(document).ready(function () {
 
 
   $('#replay').click(function () {
+    console.log("Neues Spiel");
     $.ajax({
       url: "/",
       type: "POST",
-      data: { },
+      data: {},
       success: function (response) {
         $('body').html(response);
 
-        history.pushState(null, null, "/play");
+        // history.pushState(null, null, "/play");
       },
       error: function (xhr) {
         console.log(xhr.responseText);
@@ -50,8 +51,9 @@ $(document).ready(function () {
   });
 
 
-  $('.tic-tac-toe-cell').click(function() {
-    const typed_cell = $(this).attr('id');
+  $('.tic-tac-toe-cell').click(function () {
+    var cell_div = $(this);
+    var typed_cell = $(this).attr('id');
     var player = $('.turn-info').children().attr('id');
 
     $.ajax({
@@ -61,45 +63,61 @@ $(document).ready(function () {
         'typed_cell': typed_cell,
         'player': player
       },
-      success: function (response) {
+      success: function (response, status, xhr) {
+        if (xhr.status === 200) {
+          console.log(xhr.responseText);
+          // Spielzug zulässig
+          if (player === "Player1") {
+            cell_div.html('P1');
+          } else {
+            cell_div.html('P2');
+          }
+          $('.bottom-field').html(response);
+          const replayButton = document.querySelector('#replay');
+
+          replayButton.addEventListener('click', function () {
+            console.log("Neues Spiel");
+            $.ajax({
+              url: "/",
+              type: "POST",
+              data: {},
+              success: function (response) {
+                $('body').html(response);
+              },
+              error: function (xhr) {
+                console.log(xhr.responseText);
+              }
+            });
+          });
+        }
+        // history.pushState(null, null, "/manager");
+      },
+      error: function (xhr, status) {
         // Spielzug unzulässig
-        if (response.code === 405){
+        if (xhr.status === 405) {
+          console.log("ghfghfghhdhdfdfdfdghfdfdghkjhfjktztztuztiutt");
           var fehlerMeldung = document.createElement("p");
-          fehlerMeldung.innerText = "Unzulässiger Spielzug";
+          fehlerMeldung.innerText = "Unzulaessiger Spielzug";
           fehlerMeldung.style.color = "red";
 
           var bottomFieldElement = $('.bottom-field');
 
-          if(bottomFieldElement.find('p').length > 0) {
+          console.log(bottomFieldElement);
+
+          if (bottomFieldElement.find('p').length > 0) {
             // das Element "fehlerMeldung" ist bereits vorhanden
             fehlerMeldung.style.display = "block";
-            setTimeout(function() {
+            setTimeout(function () {
               fehlerMeldung.style.display = "none";
             }, 2000);
           } else {
             // das Element "fehlerMeldung" muss hinzugefügt werden
-            bottomFieldElement.appendChild(fehlerMeldung);
-            setTimeout(function() {
+            bottomFieldElement.append(fehlerMeldung);
+            setTimeout(function () {
               fehlerMeldung.style.display = "none";
             }, 2000);
           }
         }
-        
-        // Spielzug zulässig
-        if (response.code) {
-          if (player === "Player1") {
-            $(this).html('P1');
-          }
-          else{
-            $(this).html('P2');
-          }
-          $('.bottom-field').html(response);
-        }
-
-        // history.pushState(null, null, "/manager");
-      },
-      error: function (xhr) {
-        console.log(xhr.responseText);
       }
     });
   });

@@ -13,9 +13,9 @@
             {% for row in range(0, 2) %}
                 <div class="tic-tac-toe-row">
                     {% for col in range(0, 2) %}
-                        {% set cell_id = cell_id + 1 %}
                         <div class="tic-tac-toe-cell" data-row="{{ row }}" data-col="{{ col }}"
                              id="{{ cell_id }}"></div>
+                        {% set cell_id = cell_id + 1 %}
                     {% endfor %}
                 </div>
             {% endfor %}
